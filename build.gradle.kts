@@ -33,5 +33,5 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("quick.start.AppKt")
+    mainClass.set("MainKt")
 }
