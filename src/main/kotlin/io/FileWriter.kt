@@ -6,7 +6,8 @@ package io
 class FileWriter {
 
     /**
-     * Uses a [bufferedWriter] to write content to a file at a given filePath
+     * Uses a [bufferedWriter] to set the content of a file at a given filePath.
+     * Will create new file if it doesn't exist.
      * @param filePath the file to be written to
      * @param content takes a List<String> to be written to the specified file
      */
