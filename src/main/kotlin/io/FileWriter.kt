@@ -26,8 +26,7 @@ class FileWriter {
         require(content.isNotEmpty()) { "content must not be empty" }
         if (content.size > 1) {
             var output = content.first()
-            for (i in 1 until content.size)
-                output += "\n" + content[i]
+            for (i in 1 until content.size) output += "\n" + content[i]
             return output
         } else return content.first()
     }

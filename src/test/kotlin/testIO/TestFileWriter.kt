@@ -12,8 +12,7 @@ class TestFileWriter {
     fun testWriteContentToFile() {
         val fileWriter = FileWriter()
         fileWriter.writeContentToFile(
-            "C:\\sheeeeesh\\RSC-Kotlin\\src\\test\\kotlin\\testIO\\testOutput.txt",
-            listOf("Test1", "Test2")
+            "C:\\sheeeeesh\\RSC-Kotlin\\src\\test\\kotlin\\testIO\\testOutput.txt", listOf("Test1", "Test2")
         )
         val file = File("C:\\sheeeeesh\\RSC-Kotlin\\src\\test\\kotlin\\testIO\\testOutput.txt")
         assertTrue { file.isFile }
