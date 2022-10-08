@@ -1,6 +1,6 @@
 # RSC Kotlin
 ## Overview
-This project is a compiler for the programming language RageScript (which I made up, [documentation](src/RageScript%20docs.md)) written in Kotlin compiling to Python.
+This project is a compiler for the programming language RageScript (which I made up, [documentation](RageScript%20docs.md)) written in Kotlin compiling to Python.
 It uses the general three-stage compiler structure found on [Wikipedia](https://en.wikipedia.org/wiki/Compiler). Some modules are missing because they are not necessary for RageScript or are outside the scope of this implementation.
 This is a pre-alpha version.
 
