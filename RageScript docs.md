@@ -15,8 +15,7 @@
 
 ## Variables
 - can only be defined in data segment
-- variable names must only consist `E`
-- variable names must only consist `E`
+- variable names must only consist of `E`
 - values can be assigned a value when defined in data segment
 - example:
   - `EE` defines a variable named EE
