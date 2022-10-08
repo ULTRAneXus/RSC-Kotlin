@@ -34,7 +34,7 @@ TODO: add examples
 
 ## Conditional branching
 TODO: add examples <br>
-has `if -> end if` or `if -> else -> end` if structure
+has `if -> end if` or `if -> else -> end if` structure
 - 1 Y else
 - 2 YY end if
 - 3 YYY if ==
