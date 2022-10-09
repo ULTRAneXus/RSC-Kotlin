@@ -5,7 +5,7 @@
 - code segment: code, only one function/conditional statement per line is allowed
 
 ## Values
-- only binary integers
+- only integers encoded as binary values
 - must start with `r`
 - will be negative when ending with `r`
 - consists of `e` and `a`, where `e` corresponds to 1 and `a` corresponds to 0
