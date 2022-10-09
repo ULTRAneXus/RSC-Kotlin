@@ -4,18 +4,17 @@ import kotlin.math.pow
 
 /**
  * Class that builds a table of all variables defined in the data segment
- * @param input cleaned source code from data segment
  */
-class dataTableBuilder() {
+class DataTableBuilder {
 
     /**
      * Builds a table containing all variables defined in the data segment with a Name -> value relation.
      * Assumes all values are lexically correct
+     * @param input cleaned source code from data segment
      * @return Map<String, Int> data table
      */
     fun buildDataTable(input: List<List<String>>): Map<String, Int> {
         val output = mutableMapOf<String, Int>()
-        var temp = 0
         for (line in input) {
             output[line[0]] = literalToInt(line[1])
         }
