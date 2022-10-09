@@ -18,7 +18,7 @@ class FileReader {
         println("reading File $filePath")
         val bufferedFileReader = file.bufferedReader()
         val output = mutableListOf<String>()
-        bufferedFileReader.lines().forEach { output.add(it) }
+        bufferedFileReader.lines().forEach { output.add(it.trim()) }
         println("finished reading from file $filePath")
         return output
     }
