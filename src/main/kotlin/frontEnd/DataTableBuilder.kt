@@ -1,6 +1,6 @@
 package frontEnd
 
-import kotlin.math.pow
+import helper.BinaryConverter
 
 /**
  * Class that builds a table of all variables defined in the data segment
@@ -15,32 +15,10 @@ class DataTableBuilder {
      */
     fun buildDataTable(input: List<List<String>>): Map<String, Int> {
         val output = mutableMapOf<String, Int>()
+        val binaryConverter = BinaryConverter()
         for (line in input) {
-            output[line[0]] = literalToInt(line[1])
+            output[line[0]] = binaryConverter.literalToInt(line[1])
         }
-        return output
-    }
-
-    //TODO move to a dedicated helper class
-    /**
-     * converts a given [literal] to an integer value
-     * @param literal String to be converted to integer
-     * @return Integer value of the literal
-     */
-    private fun literalToInt(literal: String): Int {
-        var output = 0
-        var segmentedLiteral = literal.toCharArray().toList()
-        segmentedLiteral = segmentedLiteral.drop(1) //remove leading r
-        segmentedLiteral = segmentedLiteral.reversed() //reverse for binary conversion
-        val literalIsNegative = segmentedLiteral.first() == 'r'
-        if (literalIsNegative) segmentedLiteral = segmentedLiteral.drop(1)
-        for (i in segmentedLiteral.indices) { //essentially binary conversion
-            when (segmentedLiteral[i]) {
-                'e' -> output += 2.0.pow(i).toInt()
-                'a' -> {}
-            }
-        }
-        if (literalIsNegative) output *= -1
         return output
     }
 }
