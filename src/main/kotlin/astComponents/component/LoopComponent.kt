@@ -12,5 +12,4 @@ data class LoopComponent(val operator: RelationalOperator) : Component {
     }
 
     var body: Component? = null
-    override var nextComponent: Component? = null
 }

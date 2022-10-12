@@ -12,5 +12,4 @@ data class AssignComponent(val operator: ArithmeticOperator) : Component {
     }
 
     var arguments: List<Argument> = listOf()
-    override var nextComponent: Component? = null
 }

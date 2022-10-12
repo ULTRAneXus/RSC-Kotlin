@@ -13,5 +13,4 @@ data class BranchComponent(val operator: RelationalOperator) : Component {
 
     var ifBody: Component? = null
     var elseBody: Component? = null
-    override var nextComponent: Component? = null
 }
