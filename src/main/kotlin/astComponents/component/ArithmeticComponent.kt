@@ -6,10 +6,7 @@ import astComponents.operator.ArithmeticOperator
 /**
  * Assign component for building the AST, RageScript equivalent of an arithmetic function
  */
-data class AssignComponent(val operator: ArithmeticOperator) : Component {
-    init {
-        var target: Argument
-    }
-
-    var arguments: List<Argument> = listOf()
+data class ArithmeticComponent(val operator: ArithmeticOperator) : Component {
+    lateinit var target: Argument
+    var arguments = mutableListOf<Argument>()
 }
