@@ -3,9 +3,9 @@ package astComponents.argument
 /**
  * Literal value [Argument]
  */
-data class LiteralArgument(val value: Int) : Argument {
+data class LiteralArgument(val value: String) : Argument {
     override fun getVal(): Int {
-        return value
+        TODO("Not yet implemented")
     }
 
 }
