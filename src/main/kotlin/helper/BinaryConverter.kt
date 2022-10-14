@@ -8,7 +8,7 @@ import kotlin.math.pow
 class BinaryConverter {
 
     /**
-     * converts a given [literal] to an integer value
+     * converts a given [literal] to an integer value, assumes lexical correctness
      * @param literal String to be converted to integer
      * @return Integer value of the literal
      */
