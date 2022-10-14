@@ -1,7 +1,7 @@
 package testHelper
 
 import helper.BinaryConverter
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class TestBinaryConverter {
