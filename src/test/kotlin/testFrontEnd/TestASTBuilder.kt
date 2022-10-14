@@ -25,14 +25,18 @@ class TestASTBuilder {
                 listOf("AAAA", "EEE", "reaa")
             )
         )
+        //test size
         assertEquals(rootComponent1.ast.size, 3)
+        //test comment
         assertTrue(rootComponent1.ast[0] is CommentComponent)
         val tempComp1 = rootComponent1.ast[0] as CommentComponent
         assertEquals(tempComp1.content, "I am a comment")
+        //test print literal
         assertTrue(rootComponent1.ast[1] is PrintComponent)
         var tempComp2 = rootComponent1.ast[1] as PrintComponent
         assertEquals(tempComp2.operator, PrintOperator.LITERAL)
         assertEquals(tempComp2.arguments, listOf(VariableArgument("EE"), LiteralArgument("reee")))
+        //test print interpreted
         assertTrue(rootComponent1.ast[2] is PrintComponent)
         tempComp2 = rootComponent1.ast[2] as PrintComponent
         assertEquals(tempComp2.operator, PrintOperator.INTERPRETED)
