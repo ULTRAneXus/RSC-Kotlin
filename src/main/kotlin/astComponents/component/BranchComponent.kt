@@ -12,6 +12,6 @@ import astComponents.operator.RelationalOperator
  */
 data class BranchComponent(val operator: RelationalOperator) : Component {
     lateinit var relationalArguments: Pair<Argument, Argument>
-    var ifBody = mutableListOf<Component>()
-    var elseBody = mutableListOf<Component>()
+    var ifBody = listOf<Component>()
+    var elseBody = listOf<Component>()
 }

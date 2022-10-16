@@ -45,6 +45,9 @@ class ASTBuilder(private val rootComponent: RootComponent) {
 
                     "OOO", "OOOO", "OOOOO", "OOOOOO", "OOOOOOO", "OOOOOOOO", "OOOOOOOOO", "OOOOOOOOOO" -> //loop
                         skipsLeft = addLoopComponent(input, linePointer, ast)
+
+                    "YYY", "YYYY", "YYYYY", "YYYYYY", "YYYYYYY", "YYYYYYYY", "YYYYYYYYY", "YYYYYYYYYY" -> //branch
+                        skipsLeft = addBranchComponent(input, linePointer, ast)
                 }
             }
         }
@@ -101,6 +104,49 @@ class ASTBuilder(private val rootComponent: RootComponent) {
     }
 
     /**
+     * Uses [input] to build a [BranchComponent]
+     * @param input List<List<String>> the code containing the branch
+     * @param linePointer Int the starting position of the branch
+     * @param ast MutableList<Component> the AST object
+     * @return Int amount of jumps necessary to reach end of branch
+     */
+    private fun addBranchComponent(input: List<List<String>>, linePointer: Int, ast: MutableList<Component>): Int {
+        val branchComponent = BranchComponent(
+            when (input[linePointer][0]) {
+                "YYY", "YYYYYYY" -> RelationalOperator.EQUALS
+                "YYYY", "YYYYYYYY" -> RelationalOperator.NOT_EQUALS
+                "YYYYY", "YYYYYYYYY" -> RelationalOperator.GREATER_EQUALS
+                else -> RelationalOperator.LESSER_EQUALS
+            }
+        )
+        branchComponent.relationalArguments = extractRelationalArguments(input[linePointer])
+        //find the closing "YY" and potential else "Y" for the current loop
+        var branchEndPointer = 0
+        var branchElsePointer = 0
+        var additionalOpenBranches = 0
+        for (line in linePointer + 1 until input.size) {
+            if (input[line][0] == "YY") { //found closing statement
+                if (additionalOpenBranches == 0) { //does closing statement belong to current branch?
+                    branchEndPointer = line //end of current branch
+                    break
+                } else additionalOpenBranches-- //closing statement doesnt belong to current loop
+            } else if (input[line][0] == "Y" && additionalOpenBranches == 0) { //does found else statement belong to current branch?
+                branchElsePointer = line //branch else statement
+            } else if (input[line][0].first() == 'Y' && input[line].size > 2) additionalOpenBranches++ //found branch opening statement
+        }
+        //fill component with new AST(s)
+        if (branchElsePointer != 0) {
+            branchComponent.ifBody = buildAST(input.drop(linePointer + 1).dropLast(input.size - branchElsePointer))
+            branchComponent.elseBody =
+                buildAST(input.drop(branchElsePointer + 1).dropLast(input.size - branchEndPointer))
+        } else {
+            branchComponent.ifBody = buildAST(input.drop(linePointer + 1).dropLast(input.size - branchEndPointer))
+        }
+        ast.add(branchComponent)
+        return branchEndPointer - linePointer //the size of the loop except the loop opening statement
+    }
+
+    /**
      * Uses [input] to build a [LoopComponent]
      * @param input List<List<String>> the code containing the loop
      * @param linePointer Int the starting position of the loop
@@ -116,12 +162,7 @@ class ASTBuilder(private val rootComponent: RootComponent) {
                 else -> RelationalOperator.LESSER_EQUALS
             }
         )
-        if (input[linePointer][0].length < 7) { //is second argument not 0?
-            loopComponent.relationalArguments =
-                Pair(toArgument(input[linePointer][1]), toArgument(input[linePointer][2]))
-        } else { //second argument is 0
-            loopComponent.relationalArguments = Pair(toArgument(input[linePointer][1]), toArgument("ra"))
-        }
+        loopComponent.relationalArguments = extractRelationalArguments(input[linePointer])
         //find the closing "OO" for the current loop
         var loopEndPointer = 0
         var additionalOpenLoops = 0
@@ -130,17 +171,26 @@ class ASTBuilder(private val rootComponent: RootComponent) {
                 if (additionalOpenLoops == 0) { //does closing statement belong to current loop?
                     loopEndPointer = line //end of current loop
                     break
-                } else { //closing statement doesnt belong to current loop
-                    additionalOpenLoops--
-                }
-            } else {
-                if (input[line][0].first() == 'O') additionalOpenLoops++ //found loop opening statement
-            }
+                } else additionalOpenLoops-- //closing statement doesnt belong to current loop
+            } else if (input[line][0].first() == 'O') additionalOpenLoops++ //found loop opening statement
         }
         //fill body with new AST
         loopComponent.body = buildAST(input.drop(linePointer + 1).dropLast(input.size - loopEndPointer))
         ast.add(loopComponent)
         return loopEndPointer - linePointer //the size of the loop except the loop opening statement
+    }
+
+    /**
+     * Extracts the relational arguments from a loop or branch statement
+     * @param line List<String> the statement
+     * @return Pair<Argument, Argument> the extracted arguments
+     */
+    private fun extractRelationalArguments(line: List<String>): Pair<Argument, Argument> {
+        return if (line[0].length < 7) { //is second argument not 0?
+            Pair(toArgument(line[1]), toArgument(line[2]))
+        } else { //second argument is 0
+            Pair(toArgument(line[1]), LiteralArgument("ra"))
+        }
     }
 
     /**
