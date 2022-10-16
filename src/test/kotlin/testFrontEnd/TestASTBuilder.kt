@@ -103,7 +103,75 @@ class TestASTBuilder {
     fun testASTBranch() {
         val rootComponent = RootComponent(mapOf("EE" to 1, "EEE" to 2))
         val astBuilder2 = ASTBuilder(rootComponent)
-        astBuilder2.buildAbstractSyntaxTree(listOf())
+        astBuilder2.buildAbstractSyntaxTree(
+            listOf(
+                listOf("YYY", "EE", "EEE"),
+                listOf("YY"),
+                listOf("YYYY", "EEE", "reee"),
+                listOf("Y"),
+                listOf("YY"),
+                listOf("YYYYY", "reee", "EE"),
+                listOf("AA", "comment 1"),
+                listOf("Y"),
+                listOf("AA", "comment 2"),
+                listOf("YY"),
+                listOf("YYYYYY", "reee", "reee"),
+                listOf("YYYYYYY", "EE", "reee"),
+                listOf("YYYYYYYY", "EE", "reee"),
+                listOf("AA", "comment 3"),
+                listOf("Y"),
+                listOf("AA", "comment 4"),
+                listOf("YY"),
+                listOf("Y"),
+                listOf("YYYYYYYYY", "EE", "reee"),
+                listOf("YY"),
+                listOf("YY"),
+                listOf("Y"),
+                listOf("YYYYYYYYYY", "EE", "reee"),
+                listOf("YY"),
+                listOf("YY")
+            )
+        )
+        genericTestASTBranch(
+            rootComponent.ast[0],
+            RelationalOperator.EQUALS,
+            Pair(VariableArgument("EE"), VariableArgument("EEE")),
+            listOf(),
+            listOf()
+        )
+        genericTestASTBranch(
+            rootComponent.ast[1],
+            RelationalOperator.NOT_EQUALS,
+            Pair(VariableArgument("EEE"), LiteralArgument("reee")),
+            listOf(),
+            listOf()
+        )
+        genericTestASTBranch(
+            rootComponent.ast[2],
+            RelationalOperator.GREATER_EQUALS,
+            Pair(LiteralArgument("reee"), VariableArgument("EE")),
+            listOf(CommentComponent("comment 1")),
+            listOf(CommentComponent("comment 2"))
+        )
+        genericTestASTBranch(
+            rootComponent.ast[3],
+            RelationalOperator.LESSER_EQUALS,
+            Pair(LiteralArgument("reee"), LiteralArgument("reee")),
+            listOf(BranchComponent(RelationalOperator.EQUALS).apply {
+                relationalArguments = Pair(VariableArgument("EE"), LiteralArgument("reee"))
+                ifBody = listOf(BranchComponent(RelationalOperator.NOT_EQUALS).apply {
+                    relationalArguments = Pair(VariableArgument("EE"), LiteralArgument("reee"))
+                    ifBody = listOf(CommentComponent("comment 3"))
+                    elseBody = listOf(CommentComponent("comment 4"))
+                })
+                elseBody = listOf(BranchComponent(RelationalOperator.GREATER_EQUALS).apply {
+                    relationalArguments = Pair(VariableArgument("EE"), LiteralArgument("reee"))
+                })
+            }),
+            listOf(BranchComponent(RelationalOperator.LESSER_EQUALS).apply {
+                relationalArguments = Pair(VariableArgument("EE"), LiteralArgument("reee"))
+            })
+        )
     }
 
     private fun genericTestASTBranch(
@@ -164,7 +232,6 @@ class TestASTBuilder {
             Pair(LiteralArgument("reae"), VariableArgument("EEE")),
             listOf(LoopComponent(RelationalOperator.LESSER_EQUALS).apply {
                 relationalArguments = Pair(VariableArgument("reer"), VariableArgument("raear"))
-                body = listOf()
             })
         )
         genericTestASTLoop(
@@ -177,7 +244,6 @@ class TestASTBuilder {
                     relationalArguments = Pair(LiteralArgument("reer"), LiteralArgument("ra"))
                     body = listOf(LoopComponent(RelationalOperator.LESSER_EQUALS).apply {
                         relationalArguments = Pair(LiteralArgument("reer"), LiteralArgument("ra"))
-                        body = listOf()
                     })
                 })
             })
