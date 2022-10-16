@@ -1,10 +1,12 @@
 package frontEnd
 
+import astComponents.argument.Argument
 import astComponents.argument.LiteralArgument
 import astComponents.argument.VariableArgument
 import astComponents.component.*
 import astComponents.operator.ArithmeticOperator
 import astComponents.operator.PrintOperator
+import astComponents.operator.RelationalOperator
 
 /**
  * Class that builds an abstract syntax tree of the code in the code segment
@@ -17,7 +19,7 @@ class ASTBuilder(private val rootComponent: RootComponent) {
      * @param input List<List<String>> code that will be used to build an AST
      */
     fun buildAbstractSyntaxTree(input: List<List<String>>) {
-        val ast = builAST(input)
+        val ast = buildAST(input)
         for (component in ast) {
             rootComponent.ast.add(component)
         }
@@ -28,14 +30,22 @@ class ASTBuilder(private val rootComponent: RootComponent) {
      * @param input List<List<String>> code that will be used to build an AST
      * @return List<Component> AST
      */
-    private fun builAST(input: List<List<String>>): List<Component> {
+    private fun buildAST(input: List<List<String>>): List<Component> {
         val ast = mutableListOf<Component>()
+        var skipsLeft = 0 //acts as a way to jump forward in for loop
         for (linePointer in input.indices) {
-            when (input[linePointer][0]) {
-                "AA" -> ast.add(getCommentComponent(input[linePointer])) //comment
-                "AAA", "AAAA" -> ast.add(getPrintComponent(input[linePointer])) //print
-                "AAAAA", "AAAAAA", "AAAAAAA", "AAAAAAAA", "AAAAAAAAA" -> //arithmetic
-                    ast.add(getArithmeticComponent(input[linePointer]))
+            if (skipsLeft > 0) { //has to jump to next line?
+                skipsLeft--
+            } else {
+                when (input[linePointer][0]) {
+                    "AA" -> ast.add(getCommentComponent(input[linePointer])) //comment
+                    "AAA", "AAAA" -> ast.add(getPrintComponent(input[linePointer])) //print
+                    "AAAAA", "AAAAAA", "AAAAAAA", "AAAAAAAA", "AAAAAAAAA" -> //arithmetic
+                        ast.add(getArithmeticComponent(input[linePointer]))
+
+                    "OOO", "OOOO", "OOOOO", "OOOOOO", "OOOOOOO", "OOOOOOOO", "OOOOOOOOO", "OOOOOOOOOO" -> //loop
+                        skipsLeft = addLoopComponent(input, linePointer, ast)
+                }
             }
         }
         return ast
@@ -63,10 +73,7 @@ class ASTBuilder(private val rootComponent: RootComponent) {
             }
         )
         for (argument in content.drop(1)) {
-            when (argument.toCharArray()[0]) {
-                'r' -> printComponent.arguments.add(LiteralArgument(argument))
-                'E' -> printComponent.arguments.add(VariableArgument(argument))
-            }
+            printComponent.arguments.add(toArgument(argument))
         }
         return printComponent
     }
@@ -88,11 +95,63 @@ class ASTBuilder(private val rootComponent: RootComponent) {
         )
         arithmeticComponent.target = VariableArgument(content[1])
         for (argument in content.drop(2)) {
-            when (argument.toCharArray()[0]) {
-                'r' -> arithmeticComponent.arguments.add(LiteralArgument(argument))
-                'E' -> arithmeticComponent.arguments.add(VariableArgument(argument))
-            }
+            arithmeticComponent.arguments.add(toArgument(argument))
         }
         return arithmeticComponent
+    }
+
+    /**
+     * Uses [input] to build a [LoopComponent]
+     * @param input List<List<String>> the code containing the loop
+     * @param linePointer Int the starting position of the loop
+     * @param ast MutableList<Component> the AST object
+     * @return Int amount of jumps necessary to reach end of loop
+     */
+    private fun addLoopComponent(input: List<List<String>>, linePointer: Int, ast: MutableList<Component>): Int {
+        val loopComponent = LoopComponent(
+            when (input[linePointer][0]) {
+                "OOO", "OOOOOOO" -> RelationalOperator.EQUALS
+                "OOOO", "OOOOOOOO" -> RelationalOperator.NOT_EQUALS
+                "OOOOO", "OOOOOOOOO" -> RelationalOperator.GREATER_EQUALS
+                else -> RelationalOperator.LESSER_EQUALS
+            }
+        )
+        if (input[linePointer][0].length < 7) { //is second argument not 0?
+            loopComponent.relationalArguments =
+                Pair(toArgument(input[linePointer][1]), toArgument(input[linePointer][2]))
+        } else { //second argument is 0
+            loopComponent.relationalArguments = Pair(toArgument(input[linePointer][1]), toArgument("ra"))
+        }
+        //find the closing "OO" for the current loop
+        var loopEndPointer = 0
+        var additionalOpenLoops = 0
+        for (line in linePointer + 1 until input.size) {
+            if (input[line][0] == "OO") { //found closing statement
+                if (additionalOpenLoops == 0) { //does closing statement belong to current loop?
+                    loopEndPointer = line //end of current loop
+                    break
+                } else { //closing statement doesnt belong to current loop
+                    additionalOpenLoops--
+                }
+            } else {
+                if (input[line][0].first() == 'O') additionalOpenLoops++ //found loop opening statement
+            }
+        }
+        //fill body with new AST
+        loopComponent.body = buildAST(input.drop(linePointer).dropLast(input.size - (loopEndPointer - 1)))
+        ast.add(loopComponent)
+        return loopEndPointer - linePointer //the size of the loop except the loop opening statement
+    }
+
+    /**
+     * Converts a string into its related Argument, assumes lexical correctness
+     * @param input String to be converted
+     * @return Argument of [input]
+     */
+    private fun toArgument(input: String): Argument {
+        return when (input.first()) {
+            'r' -> LiteralArgument(input)
+            else -> VariableArgument(input)
+        }
     }
 }

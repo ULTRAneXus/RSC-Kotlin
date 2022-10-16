@@ -11,5 +11,5 @@ import astComponents.operator.RelationalOperator
  */
 data class LoopComponent(val operator: RelationalOperator) : Component {
     lateinit var relationalArguments: Pair<Argument, Argument>
-    var body = mutableListOf<Component>()
+    var body = listOf<Component>()
 }
