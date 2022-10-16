@@ -6,6 +6,7 @@ import astComponents.argument.VariableArgument
 import astComponents.component.*
 import astComponents.operator.ArithmeticOperator
 import astComponents.operator.PrintOperator
+import astComponents.operator.RelationalOperator
 import frontEnd.ASTBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -96,5 +97,102 @@ class TestASTBuilder {
         assertEquals(operator, component.operator)
         assertEquals(target, component.target)
         assertEquals(arguments, component.arguments)
+    }
+
+    @Test
+    fun testASTBranch() {
+        val rootComponent = RootComponent(mapOf("EE" to 1, "EEE" to 2))
+        val astBuilder2 = ASTBuilder(rootComponent)
+        astBuilder2.buildAbstractSyntaxTree(listOf())
+    }
+
+    private fun genericTestASTBranch(
+        component: Component,
+        operator: RelationalOperator,
+        relationalArguments: Pair<Argument, Argument>,
+        ifBody: List<Component>,
+        elseBody: List<Component>
+    ) {
+        assertTrue(component is BranchComponent)
+        assertEquals(operator, component.operator)
+        assertEquals(relationalArguments, component.relationalArguments)
+        assertEquals(ifBody, component.ifBody)
+        assertEquals(elseBody, component.elseBody)
+    }
+
+    @Test
+    fun testASTLoop() {
+        val rootComponent = RootComponent(mapOf("EE" to 1, "EEE" to 2))
+        val astBuilder2 = ASTBuilder(rootComponent)
+        astBuilder2.buildAbstractSyntaxTree(
+            listOf(
+                listOf("OOO", "EE", "EEE"),
+                listOf("OO"),
+                listOf("OOOO", "EEE", "ree"),
+                listOf("AA", "comment 1"),
+                listOf("OO"),
+                listOf("OOOOO", "reae", "EEE"),
+                listOf("OOOOOO", "reer", "raear"),
+                listOf("OO"),
+                listOf("OO"),
+                listOf("OOOOOOO", "reer"),
+                listOf("OOOOOOOO", "reer"),
+                listOf("OOOOOOOOO", "reer"),
+                listOf("OOOOOOOOOO", "reer"),
+                listOf("AA", "comment 2"),
+                listOf("OO"),
+                listOf("OO"),
+                listOf("OO"),
+                listOf("OO"),
+            )
+        )
+        genericTestASTLoop(
+            rootComponent.ast[0],
+            RelationalOperator.EQUALS,
+            Pair(VariableArgument("EE"), VariableArgument("EEE")),
+            listOf()
+        )
+        genericTestASTLoop(
+            rootComponent.ast[1],
+            RelationalOperator.NOT_EQUALS,
+            Pair(VariableArgument("EEE"), LiteralArgument("ree")),
+            listOf(CommentComponent("comment 1"))
+        )
+        genericTestASTLoop(
+            rootComponent.ast[2],
+            RelationalOperator.GREATER_EQUALS,
+            Pair(LiteralArgument("reae"), VariableArgument("EEE")),
+            listOf(LoopComponent(RelationalOperator.LESSER_EQUALS).apply {
+                relationalArguments = Pair(VariableArgument("reer"), VariableArgument("raear"))
+                body = listOf()
+            })
+        )
+        genericTestASTLoop(
+            rootComponent.ast[3],
+            RelationalOperator.EQUALS,
+            Pair(LiteralArgument("reer"), LiteralArgument("ra")),
+            listOf(LoopComponent(RelationalOperator.NOT_EQUALS).apply {
+                relationalArguments = Pair(LiteralArgument("reer"), LiteralArgument("ra"))
+                body = listOf(LoopComponent(RelationalOperator.GREATER_EQUALS).apply {
+                    relationalArguments = Pair(LiteralArgument("reer"), LiteralArgument("ra"))
+                    body = listOf(LoopComponent(RelationalOperator.LESSER_EQUALS).apply {
+                        relationalArguments = Pair(LiteralArgument("reer"), LiteralArgument("ra"))
+                        body = listOf()
+                    })
+                })
+            })
+        )
+    }
+
+    private fun genericTestASTLoop(
+        component: Component,
+        operator: RelationalOperator,
+        relationalArguments: Pair<Argument, Argument>,
+        body: List<Component>
+    ) {
+        assertTrue(component is LoopComponent)
+        assertEquals(operator, component.operator)
+        assertEquals(relationalArguments, component.relationalArguments)
+        assertEquals(body, component.body)
     }
 }
