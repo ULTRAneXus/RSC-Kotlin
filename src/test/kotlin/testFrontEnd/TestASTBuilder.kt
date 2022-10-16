@@ -20,7 +20,7 @@ class TestASTBuilder {
     fun testBuildASTCommentPrint() {
         val rootComponent = RootComponent(mapOf("EE" to 1, "EEE" to 2))
         val astBuilder1 = ASTBuilder(rootComponent)
-        astBuilder1.buildAST(
+        astBuilder1.buildAbstractSyntaxTree(
             listOf(
                 listOf("AA", "I", "am", "a", "comment"), //comment
                 listOf("AAA", "EE", "reee"), //print literal
@@ -50,7 +50,7 @@ class TestASTBuilder {
     fun testASTArithmetic() {
         val rootComponent = RootComponent(mapOf("EE" to 1, "EEE" to 2))
         val astBuilder2 = ASTBuilder(rootComponent)
-        astBuilder2.buildAST(
+        astBuilder2.buildAbstractSyntaxTree(
             listOf(
                 listOf("AAAAA", "EE", "EE", "EEE"), //add
                 listOf("AAAAAA", "EEE", "ree", "reer"), //subtract

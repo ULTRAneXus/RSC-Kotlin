@@ -2,10 +2,7 @@ package frontEnd
 
 import astComponents.argument.LiteralArgument
 import astComponents.argument.VariableArgument
-import astComponents.component.ArithmeticComponent
-import astComponents.component.CommentComponent
-import astComponents.component.PrintComponent
-import astComponents.component.RootComponent
+import astComponents.component.*
 import astComponents.operator.ArithmeticOperator
 import astComponents.operator.PrintOperator
 
@@ -15,13 +12,24 @@ import astComponents.operator.PrintOperator
  */
 class ASTBuilder(private val rootComponent: RootComponent) {
 
-    private val ast = rootComponent.ast
-
     /**
      * Builds an AST from code and saves it the root component, assumes the input is lexically correct
      * @param input List<List<String>> code that will be used to build an AST
      */
-    fun buildAST(input: List<List<String>>) {
+    fun buildAbstractSyntaxTree(input: List<List<String>>) {
+        val ast = builAST(input)
+        for (component in ast) {
+            rootComponent.ast.add(component)
+        }
+    }
+
+    /**
+     * Builds an AST from code, assumes the input is lexically correct
+     * @param input List<List<String>> code that will be used to build an AST
+     * @return List<Component> AST
+     */
+    private fun builAST(input: List<List<String>>): List<Component> {
+        val ast = mutableListOf<Component>()
         for (linePointer in input.indices) {
             when (input[linePointer][0]) {
                 "AA" -> ast.add(getCommentComponent(input[linePointer])) //comment
@@ -30,6 +38,7 @@ class ASTBuilder(private val rootComponent: RootComponent) {
                     ast.add(getArithmeticComponent(input[linePointer]))
             }
         }
+        return ast
     }
 
     /**
