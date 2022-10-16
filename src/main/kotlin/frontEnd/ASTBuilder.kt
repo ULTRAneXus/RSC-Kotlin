@@ -138,7 +138,7 @@ class ASTBuilder(private val rootComponent: RootComponent) {
             }
         }
         //fill body with new AST
-        loopComponent.body = buildAST(input.drop(linePointer).dropLast(input.size - (loopEndPointer - 1)))
+        loopComponent.body = buildAST(input.drop(linePointer + 1).dropLast(input.size - loopEndPointer))
         ast.add(loopComponent)
         return loopEndPointer - linePointer //the size of the loop except the loop opening statement
     }
