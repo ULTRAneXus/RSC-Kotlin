@@ -3,5 +3,7 @@ package astComponents.argument
 /**
  * Argument for [astComponents.component.ArithmeticComponent], can be variable or literal
  */
-interface Argument
+interface Argument {
+    fun getVal(): String
+}
 
