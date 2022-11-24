@@ -8,7 +8,7 @@ class DataSegmentEndFinder {
     /**
      * finds the end of the data segment in [input] or returns 0
      * @param input List<List<String>> code to be analysed
-     * @return Int index of data segment end
+     * @return Int index of the last line in data segment end
      */
     fun findDataSegmentEnd(input: List<List<String>>): Int {
         for (line in input.indices) {
